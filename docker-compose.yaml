@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresSolutions_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=userdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  clearsolutions:
+    build: ./
+    restart: always
+    container_name: clearSolutions
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/userdb
+
+
+
+
+volumes:
+  postgresSolutions_data: {}
