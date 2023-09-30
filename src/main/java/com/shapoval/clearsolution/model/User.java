@@ -1,11 +1,10 @@
 package com.shapoval.clearsolution.model;
 
-
-import jakarta.persistence.*;
 import lombok.*;
 
+import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Getter
@@ -42,5 +41,5 @@ public class User {
     @CollectionTable(name = "user_phones",
             joinColumns = @JoinColumn (name = "users_id"),
     indexes = @Index(name = "users_phones_id_idx", columnList = "users_id"))
-    private List<String> phoneList ;
+    private List<String> phoneNumbers;
 }

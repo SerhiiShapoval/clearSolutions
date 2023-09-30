@@ -14,19 +14,5 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
 
-  clearsolutions:
-    build: ./
-    restart: always
-    container_name: clearSolutions
-    ports:
-      - "9090:9090"
-    depends_on:
-      - postgres
-    environment:
-      - DATABASE_URL=jdbc:postgresql://postgres:5432/userdb
-
-
-
-
 volumes:
   postgresSolutions_data: {}

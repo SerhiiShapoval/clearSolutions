@@ -7,13 +7,14 @@ import com.shapoval.clearsolution.dto.UserResponse;
 import com.shapoval.clearsolution.mapper.UserMapper;
 import com.shapoval.clearsolution.model.User;
 import com.shapoval.clearsolution.service.UserService;
-import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    private final String location = "/api/v1/users/";
+    private  String location = "/api/v1/users/";
 
 
     @PostMapping
@@ -40,13 +41,14 @@ public class UserController {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(UserResponse.<UserDto>builder()
                             .data(userMapper.toDTO(user))
+                            .path(location + user.getId())
                             .build());
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserResponse<UserDto>> updateUserEmail(@PathVariable Long id, @RequestBody UserDto userDto){
+    public ResponseEntity<UserResponse<UserDto>> updateUserEmail(@PathVariable Long id, @RequestBody String email){
 
-        User user = userService.updateUserEmail(id,userDto.getEmail());
+        User user = userService.updateUserEmail(id,email);
 
         return ResponseEntity
                 .ok()
@@ -67,7 +69,7 @@ public class UserController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(UserResponse.<UserDto>builder()
                         .data(userMapper.toDTO(user))
-                        .path(location + user)
+                        .path(location + user.getId())
                         .build());
 
     }

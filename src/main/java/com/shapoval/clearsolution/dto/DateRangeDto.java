@@ -1,12 +1,11 @@
 package com.shapoval.clearsolution.dto;
 
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Data

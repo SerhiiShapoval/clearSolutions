@@ -11,7 +11,7 @@ public enum ErrorTitle {
     WRONG_DATE(" Wrong date "),
     WRONG_AGE(" Wrong age "),
     USER_EMAIL_EXIST(" User email exist "),
-    USER_INCORRECT_DATA(" User incorrect data ");
+    VALIDATION_ERROR(" Validation error ");
 
     private final String error;
 

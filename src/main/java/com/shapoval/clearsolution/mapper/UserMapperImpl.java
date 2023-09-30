@@ -1,7 +1,6 @@
 package com.shapoval.clearsolution.mapper;
 
 import com.shapoval.clearsolution.dto.UserDto;
-import com.shapoval.clearsolution.model.Address;
 import com.shapoval.clearsolution.model.User;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,7 @@ public class UserMapperImpl implements UserMapper {
                 .lastName(user.getLastName())
                 .birthDate(user.getBirthDate())
                 .address(user.getAddress())
-                .phoneList(user.getPhoneList())
+                .phoneList(user.getPhoneNumbers())
                 .build();
     }
 
@@ -28,7 +27,7 @@ public class UserMapperImpl implements UserMapper {
                 .lastName(userDto.getLastName())
                 .birthDate(userDto.getBirthDate())
                 .address(userDto.getAddress())
-                .phoneList(userDto.getPhoneList())
+                .phoneNumbers(userDto.getPhoneList())
                 .build();
     }
 }

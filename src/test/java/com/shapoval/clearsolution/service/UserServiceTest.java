@@ -1,5 +1,6 @@
 package com.shapoval.clearsolution.service;
 
+
 import com.shapoval.clearsolution.error.UserEmailExistException;
 import com.shapoval.clearsolution.error.UserNotFoundException;
 import com.shapoval.clearsolution.error.UserWrongAgeException;
@@ -10,10 +11,12 @@ import com.shapoval.clearsolution.repository.UserRepository;
 import com.shapoval.clearsolution.service.serviceImpl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.boot.test.context.SpringBootTest;
+
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -24,7 +27,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+
+@SpringBootTest
 class UserServiceTest {
     @Mock
     private UserRepository userRepository;
@@ -58,16 +62,16 @@ class UserServiceTest {
     }
 
     @Test
-    void TestCreateUser_WhitValidValues_ReturnSavedUser() {
+    void testCreateUser_ByValidValues_ReturnSavedUser() {
 
         int countUser = userList.size();
 
-        when(userRepository.save(any(User.class))).thenReturn(userValid);
+        when(userRepository.save(userValid)).thenReturn(userValid);
 
         User userResult = userService.createUser(userValid);
         userList.add(userResult);
 
-        verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository, times(1)).save(userValid);
 
         assertNotNull(userResult);
         assertEquals(userResult.getFirstName(), userValid.getFirstName());
@@ -78,12 +82,12 @@ class UserServiceTest {
     }
 
     @Test
-    void TestCreateUser_WhitEmailExist_ReturnUserEmailExistException() {
+    void testCreateUser_ByEmailExist_ReturnUserEmailExistException() {
 
         int countUser = userList.size();
         String emailExist = "example1@gmail.com";
 
-       when(userRepository.save(userInvalid)).thenThrow(UserEmailExistException.class);
+       when(userRepository.existsUserByEmail(emailExist)).thenThrow(UserEmailExistException.class);
 
         assertEquals(emailExist, userInvalid.getEmail());
         assertThrows(UserEmailExistException.class, () -> userService.createUser(userInvalid));
@@ -93,13 +97,13 @@ class UserServiceTest {
     }
 
     @Test
-    void TestCreateUser_WhitWrongAge_ReturnUserWrongAgeException() {
+    void TestCreateUser_ByWrongAge_ReturnUserWrongAgeException() {
 
         int countUser = userList.size();
         int currentAge = Period.between(userInvalid.getBirthDate(), LocalDate.now()).getYears();
         int age = 18;
 
-        when(userRepository.save(any(User.class))).thenThrow(UserWrongAgeException.class);
+        when(userService.createUser(userInvalid)).thenThrow(UserWrongAgeException.class);
 
         assertThrows(UserWrongAgeException.class, () -> userService.createUser(userInvalid));
         assertFalse(userList.contains(userInvalid));
@@ -109,7 +113,7 @@ class UserServiceTest {
     }
 
     @Test
-    void TestCreateUser_WhitWrongBirthDate_ReturnUserWrongDateException() {
+    void TestCreateUser_ByWrongBirthDate_ReturnUserWrongDateException() {
 
         User wrongDate = User.builder()
                 .birthDate(LocalDate.of(3000, 1, 1))
@@ -149,7 +153,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testFindUserById_WhitValidId_ReturnUser() {
+    void testFindUserById_ValidId_ReturnUser() {
 
         Long id = 1l;
 
@@ -166,7 +170,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testFindUserById_WhitInvalidId_ReturnUserNotFoundExceptionUser() {
+    void testFindUserById_InvalidId_ReturnUserNotFoundExceptionUser() {
 
         Long id = 3l;
         User notFound = User.builder()
@@ -179,7 +183,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testFindUserById_WhitInvalidId_ReturnIllegalArgumentException() {
+    void testFindUserById_InvalidId_ReturnIllegalArgumentException() {
 
         Long id = -1L;
 
@@ -238,7 +242,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testSearchUsersByBirthDateRange_WithValidDate_ReturnListUsers() {
+    void testSearchUsersByBirthDateRange_ValidDate_ReturnListUsers() {
 
         userList.add(userValid);
 
@@ -256,14 +260,13 @@ class UserServiceTest {
     }
 
     @Test
-    void testSearchUsersByBirthDateRange_WithWrongDate_ReturnUserWrongDateException() {
+    void testSearchUsersByBirthDateRange_WrongDate_ReturnUserWrongDateException() {
 
 
         LocalDate from = LocalDate.of(3000,1,1);
         LocalDate to = LocalDate.of(2000,1,1);
 
         assertThrows(UserWrongDateException.class, ()-> userService.searchUsersByBirthDateRange(from,to));
-
         assertTrue(from.isAfter(to));
         verify(userRepository,never()).findUsersByBirthDateBetween(from,to);
 

@@ -2,18 +2,21 @@ package com.shapoval.clearsolution.dto;
 
 
 import com.shapoval.clearsolution.model.Address;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class UserDto {
 
     @NotBlank(message = " Email can`t be empty " )

@@ -1,7 +1,9 @@
 package com.shapoval.clearsolution.model;
 
-import jakarta.persistence.Embeddable;
+
 import lombok.*;
+
+import javax.persistence.Embeddable;
 
 @Embeddable
 @NoArgsConstructor

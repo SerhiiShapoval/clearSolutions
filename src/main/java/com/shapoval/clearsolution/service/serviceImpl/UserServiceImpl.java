@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
         userUpdate.setLastName(user.getLastName());
         userUpdate.setBirthDate(user.getBirthDate());
         userUpdate.setAddress(user.getAddress());
-        userUpdate.setPhoneList(user.getPhoneList());
+        userUpdate.setPhoneNumbers(user.getPhoneNumbers());
 
         log.info(" Update all user fields ");
         return userRepository.save(userUpdate);
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id)
                 .orElseThrow(() ->{
                     log.error(" User whit id: {} not found ", id);
-                    throw  new UserNotFoundException(" User with this " + id + " not found");
+                    throw  new UserNotFoundException(" User with this " + id + " not found ");
                 });
     }
 
@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
     private void validateDateRange(LocalDate from, LocalDate to){
         if (from.isAfter(to)){
             log.error(" Wrong date range. ");
-            throw new UserWrongDateException(" From date " + from +" must be before To date " + to);
+            throw new UserWrongDateException(" From date " + from + " must be before To date " + to);
         }
 
     }
