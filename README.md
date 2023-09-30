@@ -1,8 +1,12 @@
 # clearSolutions
-RESTful API USERES
+RESTful API USERS
+
 How to start: 
+
   1. Clone project from repositoriy 
+  
   2.Create data base, change credential in the configuration file(url,user,pasword)  
+  
     2.1 Or use docker enter command in terminal - docker compose up.
 
 Api requests:
