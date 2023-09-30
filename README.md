@@ -9,7 +9,7 @@ Api requests:
 
 Post /api/v1/users - creat user
 
-Put /api/vq/users/{id} - update user
+Put /api/v1/users/{id} - update user
 
 Patch /api/v1/users/{id} update user email
 
