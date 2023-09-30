@@ -3,7 +3,7 @@ RESTful API USERS
 
 How to start: 
 
-  1. Clone project from repositoriy 
+ 1. Clone project from repositoriy 
   
   2.Create data base, change credential in the configuration file(url,user,pasword)  
   
