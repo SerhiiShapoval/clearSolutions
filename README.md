@@ -67,6 +67,7 @@ updateUser@email.com
 {
 
 "fromDate":"1900-01-01",
+
 "toDate":"1995-01-01"
 
 }
