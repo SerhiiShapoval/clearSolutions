@@ -8,7 +8,7 @@ import com.shapoval.clearsolution.error.UserEmailExistException;
 import com.shapoval.clearsolution.error.UserNotFoundException;
 import com.shapoval.clearsolution.error.UserWrongAgeException;
 import com.shapoval.clearsolution.error.UserWrongDateException;
-import com.shapoval.clearsolution.mapper.UserMapper;
+import com.shapoval.clearsolution.model.mapper.UserMapper;
 import com.shapoval.clearsolution.model.User;
 import com.shapoval.clearsolution.repository.UserRepository;
 import com.shapoval.clearsolution.service.UserService;

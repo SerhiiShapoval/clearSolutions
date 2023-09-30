@@ -4,7 +4,7 @@ package com.shapoval.clearsolution.controller;
 import com.shapoval.clearsolution.dto.DateRangeDto;
 import com.shapoval.clearsolution.dto.UserDto;
 import com.shapoval.clearsolution.dto.UserResponse;
-import com.shapoval.clearsolution.mapper.UserMapper;
+import com.shapoval.clearsolution.model.mapper.UserMapper;
 import com.shapoval.clearsolution.model.User;
 import com.shapoval.clearsolution.service.UserService;
 

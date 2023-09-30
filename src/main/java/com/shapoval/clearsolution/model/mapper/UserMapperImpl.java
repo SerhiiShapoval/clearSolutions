@@ -1,4 +1,4 @@
-package com.shapoval.clearsolution.mapper;
+package com.shapoval.clearsolution.model.mapper;
 
 import com.shapoval.clearsolution.dto.UserDto;
 import com.shapoval.clearsolution.model.User;
