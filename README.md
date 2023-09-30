@@ -7,7 +7,9 @@ How to start:
   
   2.Create data base, change credential in the configuration file(url,user,pasword)  
   
-    2.1 Or use docker enter command in terminal - docker compose up.
+  2.1 Or use docker enter command in terminal:
+  
+    - docker compose up.
 
 Api requests:
 
