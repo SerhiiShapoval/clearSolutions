@@ -6,9 +6,13 @@ How to start:
     2.1 Or use docker enter command in terminal - docker compose up.
 
 Api requests:
+
 Post /api/v1/users - creat user
+
 Put /api/vq/users/{id} - update user
+
 Patch /api/v1/users/{id} update user email
+
 Get /api/v1/users get users by dates 
 
 Jsons :
