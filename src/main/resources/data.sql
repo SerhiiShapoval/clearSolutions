@@ -49,7 +49,7 @@ VALUES
     (240, 'user14@example.com', 'William', '1997-02-28', 'Clark', 'Country14', 'City14', 'Street14', '14N', 'Apt14', '14141'),
     (250, 'user15@example.com', 'Mia', '1986-03-07', 'Taylor', 'Country15', 'City15', 'Street15', '15O', 'Apt15', '15151'),
     (260, 'user16@example.com', 'Alexander', '1992-04-09', 'White', 'Country16', 'City16', 'Street16', '16P', 'Apt16', '16161'),
-    (270 'user17@example.com', 'Sophia', '1993-05-20', 'Hall', 'Country17', 'City17', 'Street17', '17Q', 'Apt17', '17171'),
+    (270,'user17@example.com', 'Sophia', '1993-05-20', 'Hall', 'Country17', 'City17', 'Street17', '17Q', 'Apt17', '17171'),
     (280, 'user18@example.com', 'Ethan', '1984-06-11', 'Garcia', 'Country18', 'City18', 'Street18', '18R', 'Apt18', '18181'),
     (290, 'user19@example.com', 'Olivia', '1995-07-24', 'Harris', 'Country19', 'City19', 'Street19', '19S', 'Apt19', '19191'),
     (300, 'user20@example.com', 'Liam', '1988-08-16', 'Brown', 'Country20', 'City20', 'Street20', '20T', 'Apt20', '20202');
