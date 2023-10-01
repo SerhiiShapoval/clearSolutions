@@ -3,64 +3,70 @@ RESTful API USERS
 
 How to start: 
 
- 1. Clone project from repositoriy 
+ 1.Clone project from repository
   
-  2.Create data base, change credential in the configuration file(url,user,pasword)  
+2.Create database
   
-  2.1 Or use docker enter command in terminal:
+   2.1 Change credential in the configuration file(url,user,password)  
+  
+   2.1 Or use docker enter command in terminal:
   
     - docker compose up.
 
-Api requests:
+ Api requests:
 
-Post /api/v1/users - creat user
+ Post /api/v1/users - creat user
 
-Put /api/v1/users/{id} - update user
+ Put /api/v1/users/{id} - update user
 
-Patch /api/v1/users/{id} update user email
+ Patch /api/v1/users/{id} update user email
 
-Get /api/v1/users get users by dates 
+ Get /api/v1/users get users by dates 
 
 Jsons :
 -------------------------------------
-{
+ {
 
-"email": "usere1231231@xamplem.com",
+ "email": "usere1231231@xamplem.com",
 
-"firstName": "Serhii",
+ firstName": "Serhii",
 
-"lastName": "shapoval",
+ "lastName": "shapoval",
 
-"birthDate": "1991-01-01",
+ "birthDate": "1991-01-01",
 
-"address": {
+ "address": {
 
-"country":"Ukraine",
+ "country":"Ukraine",
 
-"apartment":"123",
+ "apartment":"123",
 
-"street": "123 Main St",
+ "street": "123 Main St",
 
-"streetNumber":"1234",
+ "streetNumber":"1234",
 
-"city": "Example City",
+ "city": "Example City",
 
-"zip": "12345"
+ "zip": "12345"
 
-},
+ },
 
-"phoneList": [
+ "phoneList": [
 
-"123-456-7890",
+ "123-456-7890",
 
-"987-654-3210"
+ "987-654-3210"
 
 ]
 
 }
--------------------------------------
 
-updateUser@email.com     
+-------------------------------------
+{
+
+"email":"updateUser@email.com"
+
+}
 
 -------------------------------------    
 

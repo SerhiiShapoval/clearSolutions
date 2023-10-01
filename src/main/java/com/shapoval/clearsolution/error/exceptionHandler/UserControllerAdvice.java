@@ -1,6 +1,7 @@
 package com.shapoval.clearsolution.error.exceptionHandler;
 
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.shapoval.clearsolution.error.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.Objects;
 
 @RestControllerAdvice
 public class UserControllerAdvice {
+
 
     @ExceptionHandler(UserWrongDateException.class)
     public ResponseEntity<UserErrorResponse> handleUserWrongDateException(UserWrongDateException exception

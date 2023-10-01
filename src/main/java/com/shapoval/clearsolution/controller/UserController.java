@@ -2,13 +2,16 @@ package com.shapoval.clearsolution.controller;
 
 
 import com.shapoval.clearsolution.dto.DateRangeDto;
+import com.shapoval.clearsolution.dto.EmailDto;
 import com.shapoval.clearsolution.dto.UserDto;
 import com.shapoval.clearsolution.dto.UserResponse;
-import com.shapoval.clearsolution.model.mapper.UserMapper;
+import com.shapoval.clearsolution.mapper.UserMapper;
 import com.shapoval.clearsolution.model.User;
 import com.shapoval.clearsolution.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
 
 
 
@@ -46,9 +48,10 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserResponse<UserDto>> updateUserEmail(@PathVariable Long id, @RequestBody String email){
+    public ResponseEntity<UserResponse<UserDto>> updateUserEmail
+            (@PathVariable Long id, @RequestBody @Valid EmailDto email){
 
-        User user = userService.updateUserEmail(id,email);
+        User user = userService.updateUserEmail(id, email.getEmail());
 
         return ResponseEntity
                 .ok()
@@ -61,7 +64,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse<UserDto>> updateAllFieldsUser(@PathVariable Long id, @RequestBody UserDto userDto){
+    public ResponseEntity<UserResponse<UserDto>> updateAllFieldsUser(@PathVariable Long id, @RequestBody @Valid UserDto userDto){
 
          User user = userService.updateUser(id,userMapper.toUser(userDto));
 
@@ -86,17 +89,17 @@ public class UserController {
     }
 
     @GetMapping( )
-    private ResponseEntity<UserResponse<List<UserDto>>> searchUsersByDateRange( @Valid @RequestBody DateRangeDto dateRange){
-        List<UserDto> userDtoList =
-                 userService.searchUsersByBirthDateRange(dateRange.getFromDate(),dateRange.getToDate())
-                .stream()
-                .map(userMapper::toDTO)
-                .toList();
+    private ResponseEntity<UserResponse<Page<UserDto>>> searchUsersByDateRange( @Valid @RequestBody DateRangeDto dateRange
+            ,@RequestParam(name = "page", defaultValue = "0",required = false) int page
+    ,@RequestParam(name = "size", defaultValue = "10",required = false) int size){
+        Page<User> userPage = userService.searchUsersByBirthDateRange(dateRange.getFromDate(),dateRange.getToDate(), PageRequest.of(page, size));
+        Page<UserDto> userDtoList = userMapper.toPageUserDto(userPage);
+
 
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(UserResponse.<List<UserDto>>builder()
+                .body(UserResponse.<Page<UserDto>>builder()
                         .data(userDtoList)
                         .path("/api/v1/users")
                         .build());

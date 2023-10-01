@@ -10,7 +10,6 @@ import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
-@Validated
 public class DateRangeDto {
 
    @NotNull(message = " From date can`t be null. This date is required ")

@@ -16,6 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 
 import java.time.LocalDate;
@@ -64,66 +66,57 @@ class UserServiceTest {
     @Test
     void testCreateUser_ByValidValues_ReturnSavedUser() {
 
-        int countUser = userList.size();
+
 
         when(userRepository.save(userValid)).thenReturn(userValid);
 
         User userResult = userService.createUser(userValid);
-        userList.add(userResult);
+
 
         verify(userRepository, times(1)).save(userValid);
 
         assertNotNull(userResult);
         assertEquals(userResult.getFirstName(), userValid.getFirstName());
         assertEquals(userResult.getLastName(), userValid.getLastName());
-        assertTrue(userList.contains(userResult));
-        assertNotEquals(countUser, userList.size());
 
     }
 
     @Test
     void testCreateUser_ByEmailExist_ReturnUserEmailExistException() {
 
-        int countUser = userList.size();
         String emailExist = "example1@gmail.com";
 
        when(userRepository.existsUserByEmail(emailExist)).thenThrow(UserEmailExistException.class);
 
         assertEquals(emailExist, userInvalid.getEmail());
         assertThrows(UserEmailExistException.class, () -> userService.createUser(userInvalid));
-        assertFalse(userList.contains(userInvalid));
-        assertEquals(countUser, userList.size());
+
+
 
     }
 
     @Test
-    void TestCreateUser_ByWrongAge_ReturnUserWrongAgeException() {
+    void testCreateUser_ByWrongAge_ReturnUserWrongAgeException() {
 
-        int countUser = userList.size();
         int currentAge = Period.between(userInvalid.getBirthDate(), LocalDate.now()).getYears();
         int age = 18;
 
+
         when(userService.createUser(userInvalid)).thenThrow(UserWrongAgeException.class);
-
         assertThrows(UserWrongAgeException.class, () -> userService.createUser(userInvalid));
-        assertFalse(userList.contains(userInvalid));
-        assertEquals(countUser, userList.size());
-        assertTrue(age > currentAge);
 
+        assertTrue(age > currentAge);
+        verify(userRepository,never()).save(userValid);
     }
 
     @Test
-    void TestCreateUser_ByWrongBirthDate_ReturnUserWrongDateException() {
+    void testCreateUser_ByWrongBirthDate_ReturnUserWrongDateException() {
 
         User wrongDate = User.builder()
                 .birthDate(LocalDate.of(3000, 1, 1))
                 .build();
 
-        int countUser = userList.size();
-
         assertThrows(UserWrongDateException.class, () -> userService.createUser(wrongDate));
-        assertFalse(userList.contains(userInvalid));
-        assertEquals(countUser, userList.size());
         assertTrue(wrongDate.getBirthDate().isAfter(LocalDate.now()));
 
     }
@@ -132,24 +125,23 @@ class UserServiceTest {
     void testDeleteUser() {
 
         Long id = 1L;
-        userList.add(userValid);
-        int countUser = userList.size();
 
         when(userRepository.findById(id)).thenReturn(Optional.ofNullable(userValid));
-        doNothing().when(userRepository).delete(any(User.class));
 
         User willBeDeleted = userRepository.findById(id).orElseThrow();
 
         assertEquals(id,willBeDeleted.getId());
+        assertEquals(willBeDeleted.getFirstName(),userValid.getFirstName());
+        assertEquals(willBeDeleted.getEmail(),userValid.getEmail());
+
+       doNothing().when(userRepository).delete(userValid);
+
         verify(userRepository,times(1)).findById(id);
 
         userService.deleteUser(id);
-        boolean answer = userList.remove(userValid);
 
-        assertTrue(answer);
-        assertNotEquals(countUser, userList.size());
-        assertFalse(userList.contains(userValid));
-        verify(userRepository, times(1)).delete(any(User.class));
+       verify(userRepository,times(1)).delete(userValid);
+
     }
 
     @Test
@@ -159,13 +151,14 @@ class UserServiceTest {
 
        when(userRepository.findById(id)).thenReturn(Optional.ofNullable(userValid));
 
-       User currentUser = userService.findUserById(id);
+       User currentUserBiId = userService.findUserById(id);
+
+       assertNotNull(currentUserBiId);
+       assertEquals(currentUserBiId.getEmail(),userValid.getEmail());
+       assertEquals(currentUserBiId.getFirstName(),userValid.getFirstName());
+       assertEquals(id, currentUserBiId.getId());
 
        verify(userRepository,times(1)).findById(id);
-
-       assertNotNull(currentUser);
-       assertEquals(currentUser,userValid);
-       assertEquals(id, currentUser.getId());
 
     }
 
@@ -173,11 +166,9 @@ class UserServiceTest {
     void testFindUserById_InvalidId_ReturnUserNotFoundExceptionUser() {
 
         Long id = 3l;
-        User notFound = User.builder()
-                .id(id)
-                .build();
 
-        assertFalse(userList.contains(notFound));
+        when(userRepository.findById(id)).thenThrow(UserNotFoundException.class);
+
         assertThrows(UserNotFoundException.class, ()->userService.findUserById(id));
 
     }
@@ -200,7 +191,8 @@ class UserServiceTest {
         String emailUpdate = "update@email.com";
 
         when(userRepository.findById(id)).thenReturn(Optional.ofNullable(userValid));
-        when(userRepository.save(any(User.class))).thenReturn(userUpdate);
+
+        when(userRepository.save(userValid)).thenReturn(userUpdate);
 
 
         User result = userService.updateUserEmail(id, emailUpdate);
@@ -210,13 +202,13 @@ class UserServiceTest {
         assertEquals(emailUpdate, result.getEmail());
         assertEquals(id, userUpdate.getId());
         verify(userRepository,times(1)).findById(id);
-        verify(userRepository,times(1)).save(any(User.class));
+        verify(userRepository,times(1)).save(userValid);
 
     }
 
 
     @Test
-    void testUpdateUserAllFields_ReturnUpdateUser() {
+    void testUpdateUserAllFields_ReturnUpdatedUser() {
 
         Long id = 1L;
         User updatedUserFields =
@@ -229,6 +221,8 @@ class UserServiceTest {
         User userFromDB = userRepository.findById(id).orElseThrow();
 
         assertEquals(updatedUserFields.getId(),userFromDB.getId());
+        assertNotEquals(userFromDB.getEmail(),updatedUserFields.getEmail());
+        assertNotEquals(userFromDB.getFirstName(),updatedUserFields.getFirstName());
         assertNotEquals(updatedUserFields, userFromDB);
         verify(userRepository,times(1)).findById(id);
 
@@ -237,6 +231,8 @@ class UserServiceTest {
         assertNotNull(result);
         assertEquals(id, result.getId());
         assertEquals(updatedUserFields, result);
+        assertEquals(updatedUserFields.getFirstName(),result.getFirstName());
+        assertEquals(updatedUserFields.getEmail(),result.getEmail());
         verify(userRepository,times(1)).save(updatedUserFields);
 
     }
@@ -245,28 +241,28 @@ class UserServiceTest {
     void testSearchUsersByBirthDateRange_ValidDate_ReturnListUsers() {
 
         userList.add(userValid);
-
+        Pageable pageable = PageRequest.of(0,10);
         LocalDate from = LocalDate.of(1900,1,1);
         LocalDate to = LocalDate.of(2000,1,1);
 
         when(userRepository.findUsersByBirthDateBetween(from,to)).thenReturn(userList);
 
-        var result = userService.searchUsersByBirthDateRange(from,to);
+        var result = userService.searchUsersByBirthDateRange(from,to,pageable);
 
         assertNotNull(result);
-        assertTrue(result.size() > 0);
-        assertTrue(result.get(0).getBirthDate().isBefore(to));
-        assertFalse(result.get(0).getBirthDate().isBefore(from));
+        assertTrue(result.getContent().size() > 0);
+        assertTrue(result.getContent().get(0).getBirthDate().isBefore(to));
+        assertFalse(result.getContent().get(0).getBirthDate().isBefore(from));
     }
 
     @Test
     void testSearchUsersByBirthDateRange_WrongDate_ReturnUserWrongDateException() {
 
-
+        Pageable pageable = PageRequest.of(0,10);
         LocalDate from = LocalDate.of(3000,1,1);
         LocalDate to = LocalDate.of(2000,1,1);
 
-        assertThrows(UserWrongDateException.class, ()-> userService.searchUsersByBirthDateRange(from,to));
+        assertThrows(UserWrongDateException.class, ()-> userService.searchUsersByBirthDateRange(from,to,pageable));
         assertTrue(from.isAfter(to));
         verify(userRepository,never()).findUsersByBirthDateBetween(from,to);
 

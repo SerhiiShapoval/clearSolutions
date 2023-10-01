@@ -20,7 +20,6 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @SequenceGenerator(name = "", initialValue = 20)
     private Long id;
 
     @Column(name = "email", unique = true, nullable = false)
