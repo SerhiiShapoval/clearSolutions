@@ -19,5 +19,5 @@ public interface UserService {
 
     User updateUser(Long id, User user);
 
-    Page<User> searchUsersByBirthDateRange(LocalDate from, LocalDate to,Pageable pageable);
+    List<User> searchUsersByBirthDateRange(LocalDate from, LocalDate to);
 }

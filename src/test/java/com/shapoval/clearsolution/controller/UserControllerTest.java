@@ -11,13 +11,13 @@ import com.shapoval.clearsolution.error.UserWrongAgeException;
 import com.shapoval.clearsolution.error.UserWrongDateException;
 import com.shapoval.clearsolution.mapper.UserMapper;
 import com.shapoval.clearsolution.model.User;
-import com.shapoval.clearsolution.repository.UserRepository;
 import com.shapoval.clearsolution.service.UserService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -55,7 +54,6 @@ class UserControllerTest {
     private List<UserDto> listDto;
 
     private Page<UserDto> listPageDto;
-    private Page<User> listPage;
     private Pageable pageable;
     private EmailDto emailDto;
 
@@ -85,14 +83,13 @@ class UserControllerTest {
         listDto = new ArrayList<>();
         list.add(testUser);
         listDto.add(testUserDto);
-        listPage = new PageImpl<>(list,pageable,list.size() );
         listPageDto = new PageImpl<>(listDto,pageable,listDto.size());
 
         emailDto = new EmailDto("example123@gmail.com");
 
         when(userMapper.toUser(testUserDto)).thenReturn(testUser);
         when(userMapper.toDTO(testUser)).thenReturn(testUserDto);
-        when(userMapper.toPageUserDto(listPage)).thenReturn(listPageDto);
+        when(userMapper.toPageUserDto(list,pageable )).thenReturn(listPageDto);
     }
 
     @Test
@@ -430,7 +427,7 @@ class UserControllerTest {
     void searchUsersByDateRange_ByDateRangeDto_ReturnUserResponseOk200() throws Exception {
 
 
-        when(userService.searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate(),pageable)).thenReturn(listPage);
+        when(userService.searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate())).thenReturn(list);
 
         mockMvc.perform(get("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -440,13 +437,13 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data.content.[0].firstName").value("Serhii"))
                 .andExpect(jsonPath("$.data.content.[0].lastName").value("Shapoval"));
         verify(userService,times(1))
-                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate(),pageable);
+                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate());
 
     }
     @Test
     void searchUsersByDateRange_ByWrongDateRangeDto_ReturnUserErrorResponseBadRequest400() throws Exception {
 
-        when(userService.searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate(),pageable))
+        when(userService.searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate()))
                 .thenThrow((new UserWrongDateException(" From date "  + dateRangeDto.getFromDate().toString() + " must be before "
                         + dateRangeDto.getToDate().toString())));
 
@@ -459,7 +456,7 @@ class UserControllerTest {
                         value(" From date "  + dateRangeDto.getFromDate().toString() + " must be before " + dateRangeDto.getToDate().toString()))
                 .andExpect(jsonPath("$.path").value("/api/v1/users"));
         verify(userService,times(1))
-                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(),dateRangeDto.getToDate(),pageable);
+                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(),dateRangeDto.getToDate());
 
     }
 
@@ -477,7 +474,7 @@ class UserControllerTest {
                         value(" From date can`t be null. This date is required "))
                 .andExpect(jsonPath("$.path").value("/api/v1/users"));
         verify(userService,never())
-                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(),dateRangeDto.getToDate(),pageable);
+                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(),dateRangeDto.getToDate());
 
     }
 }

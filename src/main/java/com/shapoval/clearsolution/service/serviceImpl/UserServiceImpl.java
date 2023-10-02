@@ -28,18 +28,17 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+
     @Value("${user.minAge}")
     private  int minAgeUser;
 
 
     @Override
-    public Page<User> searchUsersByBirthDateRange(LocalDate from, LocalDate to, Pageable pageable) {
+    public List<User> searchUsersByBirthDateRange(LocalDate from, LocalDate to) {
 
         validateDateRange(from,to);
-        List<User> userList = userRepository.findUsersByBirthDateBetween(from,to);
-        Page<User> userPage= new PageImpl<>(userList,pageable,userList.size());
         log.info(" Search users by birth date from {} to {}", from, to);
-        return userPage;
+        return userRepository.findUsersByBirthDateBetween(from,to);
     }
 
     @Override

@@ -247,22 +247,22 @@ class UserServiceTest {
 
         when(userRepository.findUsersByBirthDateBetween(from,to)).thenReturn(userList);
 
-        var result = userService.searchUsersByBirthDateRange(from,to,pageable);
+        var result = userService.searchUsersByBirthDateRange(from,to);
 
         assertNotNull(result);
-        assertTrue(result.getContent().size() > 0);
-        assertTrue(result.getContent().get(0).getBirthDate().isBefore(to));
-        assertFalse(result.getContent().get(0).getBirthDate().isBefore(from));
+        assertTrue(result.size() > 0);
+        assertTrue(result.get(0).getBirthDate().isBefore(to));
+        assertFalse(result.get(0).getBirthDate().isBefore(from));
     }
 
     @Test
     void testSearchUsersByBirthDateRange_WrongDate_ReturnUserWrongDateException() {
 
-        Pageable pageable = PageRequest.of(0,10);
+
         LocalDate from = LocalDate.of(3000,1,1);
         LocalDate to = LocalDate.of(2000,1,1);
 
-        assertThrows(UserWrongDateException.class, ()-> userService.searchUsersByBirthDateRange(from,to,pageable));
+       assertThrows(UserWrongDateException.class, ()-> userService.searchUsersByBirthDateRange(from,to));
         assertTrue(from.isAfter(to));
         verify(userRepository,never()).findUsersByBirthDateBetween(from,to);
 

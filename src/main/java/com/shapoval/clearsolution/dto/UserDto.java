@@ -1,11 +1,13 @@
 package com.shapoval.clearsolution.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.shapoval.clearsolution.model.Address;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.domain.Pageable;
 
 
 import javax.validation.constraints.NotBlank;
@@ -36,5 +38,6 @@ public class UserDto {
     private Address address;
 
     private List<String> phoneList;
+
 
 }
