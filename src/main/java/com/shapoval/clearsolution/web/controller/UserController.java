@@ -1,12 +1,12 @@
-package com.shapoval.clearsolution.controller;
+package com.shapoval.clearsolution.web.controller;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.shapoval.clearsolution.dto.DateRangeDto;
-import com.shapoval.clearsolution.dto.EmailDto;
-import com.shapoval.clearsolution.dto.UserDto;
-import com.shapoval.clearsolution.dto.UserResponse;
-import com.shapoval.clearsolution.mapper.UserMapper;
+import com.shapoval.clearsolution.web.controller.dto.PageResponse;
+import com.shapoval.clearsolution.web.controller.dto.DateRangeDto;
+import com.shapoval.clearsolution.web.controller.dto.EmailDto;
+import com.shapoval.clearsolution.web.controller.dto.UserDto;
+import com.shapoval.clearsolution.web.controller.dto.UserResponse;
+import com.shapoval.clearsolution.web.controller.mapper.UserMapper;
 import com.shapoval.clearsolution.model.User;
 import com.shapoval.clearsolution.service.UserService;
 
@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +31,9 @@ import java.net.URI;
 public class UserController {
 
     private final UserService userService;
-    private final UserMapper userMapper;
+    private final UserMapper userMapper = UserMapper.mapper;
 
-    private  String location = "/api/v1/users/";
+    private String location = "/api/v1/users/";
 
 
     @PostMapping
@@ -89,21 +90,21 @@ public class UserController {
                 .build();
 
     }
-    @JsonIgnore()
-    @GetMapping()
-    private ResponseEntity<UserResponse<Page<UserDto>>> searchUsersByDateRange( @Valid @RequestBody DateRangeDto dateRange
-            ,@RequestParam(name = "page", defaultValue = "0",required = false) int page
-    ,@RequestParam(name = "size", defaultValue = "10",required = false) int size){
-        Pageable pageable = PageRequest.of(page,size);
-        Page<UserDto> userDtoList =
-                userMapper.toPageUserDto(userService.searchUsersByBirthDateRange(dateRange.getFromDate(),dateRange.getToDate()),pageable);
 
+    @GetMapping()
+    private ResponseEntity<UserResponse<PageResponse<UserDto>>> searchUsersByDateRange(@Valid @RequestBody DateRangeDto dateRange
+            , @RequestParam(name = "page", defaultValue = "0",required = false) int page
+    , @RequestParam(name = "size", defaultValue = "10",required = false) int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserDto> userDtoList =
+                userService.searchUsersByBirthDateRange(dateRange.getFromDate(),dateRange.getToDate(),pageable)
+                        .map(userMapper::toDTO);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(UserResponse.<Page<UserDto>>builder()
-                        .data(userDtoList)
-                        .path("/api/v1/users")
+                .body(UserResponse.<PageResponse<UserDto>>builder()
+                        .data(new PageResponse<>(userDtoList.getContent(),userDtoList.getTotalElements(),pageable))
+                        .path(location)
                         .build());
 
     }

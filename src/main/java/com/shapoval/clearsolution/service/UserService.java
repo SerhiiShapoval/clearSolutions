@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public interface UserService {
 
@@ -19,5 +18,5 @@ public interface UserService {
 
     User updateUser(Long id, User user);
 
-    List<User> searchUsersByBirthDateRange(LocalDate from, LocalDate to);
+    Page<User> searchUsersByBirthDateRange(LocalDate from, LocalDate to,Pageable pageable);
 }

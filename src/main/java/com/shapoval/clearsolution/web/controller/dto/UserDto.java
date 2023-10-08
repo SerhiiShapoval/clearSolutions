@@ -1,4 +1,4 @@
-package com.shapoval.clearsolution.dto;
+package com.shapoval.clearsolution.web.controller.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -7,7 +7,7 @@ import com.shapoval.clearsolution.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.domain.Pageable;
+
 
 
 import javax.validation.constraints.NotBlank;
@@ -19,6 +19,7 @@ import java.util.List;
 @Data
 @Builder
 @AllArgsConstructor
+
 public class UserDto {
 
     @NotBlank(message = " Email can`t be empty " )
@@ -37,7 +38,7 @@ public class UserDto {
 
     private Address address;
 
-    private List<String> phoneList;
+    private List<String> phoneNumbers;
 
 
 }

@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +32,11 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<User> searchUsersByBirthDateRange(LocalDate from, LocalDate to) {
+    public Page<User> searchUsersByBirthDateRange(LocalDate from, LocalDate to, Pageable pageable) {
 
         validateDateRange(from,to);
         log.info(" Search users by birth date from {} to {}", from, to);
-        return userRepository.findUsersByBirthDateBetween(from,to);
+        return userRepository.findUsersByBirthDateBetween(from,to,pageable);
     }
 
     @Override

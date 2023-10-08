@@ -2,22 +2,22 @@ package com.shapoval.clearsolution.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shapoval.clearsolution.dto.DateRangeDto;
-import com.shapoval.clearsolution.dto.EmailDto;
-import com.shapoval.clearsolution.dto.UserDto;
+import com.shapoval.clearsolution.web.controller.dto.DateRangeDto;
+import com.shapoval.clearsolution.web.controller.dto.EmailDto;
+import com.shapoval.clearsolution.web.controller.dto.UserDto;
 import com.shapoval.clearsolution.error.UserEmailExistException;
 import com.shapoval.clearsolution.error.UserNotFoundException;
 import com.shapoval.clearsolution.error.UserWrongAgeException;
 import com.shapoval.clearsolution.error.UserWrongDateException;
-import com.shapoval.clearsolution.mapper.UserMapper;
+import com.shapoval.clearsolution.web.controller.mapper.UserMapper;
 import com.shapoval.clearsolution.model.User;
 import com.shapoval.clearsolution.service.UserService;
 
+import com.shapoval.clearsolution.web.controller.UserController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -89,7 +89,7 @@ class UserControllerTest {
 
         when(userMapper.toUser(testUserDto)).thenReturn(testUser);
         when(userMapper.toDTO(testUser)).thenReturn(testUserDto);
-        when(userMapper.toPageUserDto(list,pageable )).thenReturn(listPageDto);
+        when(userMapper.toPageUserDto((list)).thenReturn(listPageDto);
     }
 
     @Test
@@ -427,7 +427,7 @@ class UserControllerTest {
     void searchUsersByDateRange_ByDateRangeDto_ReturnUserResponseOk200() throws Exception {
 
 
-        when(userService.searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate())).thenReturn(list);
+        when(userService.searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate(), )).thenReturn(list);
 
         mockMvc.perform(get("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -437,13 +437,13 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data.content.[0].firstName").value("Serhii"))
                 .andExpect(jsonPath("$.data.content.[0].lastName").value("Shapoval"));
         verify(userService,times(1))
-                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate());
+                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate(), );
 
     }
     @Test
     void searchUsersByDateRange_ByWrongDateRangeDto_ReturnUserErrorResponseBadRequest400() throws Exception {
 
-        when(userService.searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate()))
+        when(userService.searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate(), ))
                 .thenThrow((new UserWrongDateException(" From date "  + dateRangeDto.getFromDate().toString() + " must be before "
                         + dateRangeDto.getToDate().toString())));
 
@@ -456,7 +456,7 @@ class UserControllerTest {
                         value(" From date "  + dateRangeDto.getFromDate().toString() + " must be before " + dateRangeDto.getToDate().toString()))
                 .andExpect(jsonPath("$.path").value("/api/v1/users"));
         verify(userService,times(1))
-                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(),dateRangeDto.getToDate());
+                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(),dateRangeDto.getToDate(), );
 
     }
 
@@ -474,7 +474,7 @@ class UserControllerTest {
                         value(" From date can`t be null. This date is required "))
                 .andExpect(jsonPath("$.path").value("/api/v1/users"));
         verify(userService,never())
-                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(),dateRangeDto.getToDate());
+                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(),dateRangeDto.getToDate(), );
 
     }
 }

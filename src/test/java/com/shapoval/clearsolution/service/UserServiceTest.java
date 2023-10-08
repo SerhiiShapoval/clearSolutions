@@ -247,7 +247,7 @@ class UserServiceTest {
 
         when(userRepository.findUsersByBirthDateBetween(from,to)).thenReturn(userList);
 
-        var result = userService.searchUsersByBirthDateRange(from,to);
+        var result = userService.searchUsersByBirthDateRange(from,to, );
 
         assertNotNull(result);
         assertTrue(result.size() > 0);
@@ -262,7 +262,7 @@ class UserServiceTest {
         LocalDate from = LocalDate.of(3000,1,1);
         LocalDate to = LocalDate.of(2000,1,1);
 
-       assertThrows(UserWrongDateException.class, ()-> userService.searchUsersByBirthDateRange(from,to));
+       assertThrows(UserWrongDateException.class, ()-> userService.searchUsersByBirthDateRange(from,to, ));
         assertTrue(from.isAfter(to));
         verify(userRepository,never()).findUsersByBirthDateBetween(from,to);
 

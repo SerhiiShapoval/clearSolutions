@@ -16,17 +16,17 @@ create table users (
   primary key (id)
 );
 create table user_phones (
-  users_id int8 not null,
+  user_id int8 not null,
   phone_numbers varchar(255)
 );
-create index users_phones_id_idx on user_phones (users_id);
+create index users_phones_id_idx on user_phones (user_id);
 
 alter table if exists users
     add constraint users_email unique (email);
 
 alter table if exists user_phones
     add constraint users_user_phones_fk
-        foreign key (users_id)
+        foreign key (user_id)
             references users;
 
 -- Insert sample data for the User entity
@@ -54,7 +54,7 @@ VALUES
     (300, 'user20@example.com', 'Liam', '1988-08-16', 'Brown', 'Country20', 'City20', 'Street20', '20T', 'Apt20', '20202');
 
 -- Insert sample data for the user_phones table
-INSERT INTO user_phones (users_id, phone_numbers)
+INSERT INTO user_phones (user_id, phone_numbers)
 VALUES
     (110, '123-456-7890'),
     (120, '987-654-3210'),

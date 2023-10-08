@@ -1,4 +1,4 @@
-package com.shapoval.clearsolution.dto;
+package com.shapoval.clearsolution.web.controller.dto;
 
 
 import lombok.AllArgsConstructor;

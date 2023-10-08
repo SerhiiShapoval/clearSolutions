@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -39,7 +40,7 @@ public class User {
 
     @ElementCollection
     @CollectionTable(name = "user_phones",
-            joinColumns = @JoinColumn (name = "users_id"),
-    indexes = @Index(name = "users_phones_id_idx", columnList = "users_id"))
-    private List<String> phoneNumbers;
+            joinColumns = @JoinColumn (name = "user_id"),
+    indexes = @Index(name = "users_phones_id_idx", columnList = "user_id"))
+    private List<String> phoneNumbers = new ArrayList<>();
 }
