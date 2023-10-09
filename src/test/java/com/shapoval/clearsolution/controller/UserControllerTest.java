@@ -2,25 +2,29 @@ package com.shapoval.clearsolution.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shapoval.clearsolution.web.controller.dto.DateRangeDto;
-import com.shapoval.clearsolution.web.controller.dto.EmailDto;
-import com.shapoval.clearsolution.web.controller.dto.UserDto;
+import com.shapoval.clearsolution.web.dto.DateRangeDto;
+import com.shapoval.clearsolution.web.dto.EmailDto;
+import com.shapoval.clearsolution.web.dto.UserDto;
 import com.shapoval.clearsolution.error.UserEmailExistException;
 import com.shapoval.clearsolution.error.UserNotFoundException;
 import com.shapoval.clearsolution.error.UserWrongAgeException;
 import com.shapoval.clearsolution.error.UserWrongDateException;
-import com.shapoval.clearsolution.web.controller.mapper.UserMapper;
+import com.shapoval.clearsolution.web.mapper.UserMapper;
 import com.shapoval.clearsolution.model.User;
 import com.shapoval.clearsolution.service.UserService;
 
 import com.shapoval.clearsolution.web.controller.UserController;
+import com.shapoval.clearsolution.web.mapper.UserMapperImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -54,6 +58,7 @@ class UserControllerTest {
     private List<UserDto> listDto;
 
     private Page<UserDto> listPageDto;
+    private Page<User> pageUser;
     private Pageable pageable;
     private EmailDto emailDto;
 
@@ -62,11 +67,13 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
-    @MockBean
-    private UserMapper userMapper;
+   @MockBean
+    private UserMapper userMapper ;
 
     @BeforeEach
     void setUp(){
+
+
 
         testUser = new User(1L,"example@gmail.com","Serhii",
                 LocalDate.of(1991,1,13),"Shapoval",null,null);
@@ -86,17 +93,17 @@ class UserControllerTest {
         listPageDto = new PageImpl<>(listDto,pageable,listDto.size());
 
         emailDto = new EmailDto("example123@gmail.com");
+        pageUser = new PageImpl<>(list,pageable, list.size());
 
-        when(userMapper.toUser(testUserDto)).thenReturn(testUser);
-        when(userMapper.toDTO(testUser)).thenReturn(testUserDto);
-        when(userMapper.toPageUserDto((list)).thenReturn(listPageDto);
+//        when(userMapper.toUser(any(UserDto.class))).thenReturn(testUser);
+//        when(userMapper.toDTO(any(User.class))).thenReturn(testUserDto);
+
     }
 
     @Test
     void createUser_ReturnUser200Ok() throws Exception {
 
-        when(userService.createUser(testUser)).thenReturn(testUser);
-
+        when(userService.createUser(any(User.class))).thenReturn(testUser);
 
         mockMvc.perform(post("/api/v1/users")
                         .content(objectMapper.writeValueAsString(testUserDto))
@@ -119,10 +126,12 @@ class UserControllerTest {
                 LocalDate.of(1996,5,16),null,null);
         User userExistEmail = new User(2L,"example@gmail.com","Grisha",
                 LocalDate.of(1996,5,16),"Privet",null,null);
+
         when(userMapper.toUser(existEmail)).thenReturn(userExistEmail);
 
-        when(userService.createUser(userExistEmail)).thenThrow( new UserEmailExistException(" This email example@gmail.com is busy "));
-        System.out.println(userMapper.toUser(existEmail));
+        when(userService.createUser(userMapper.toUser(existEmail)))
+                .thenThrow( new UserEmailExistException(" This email example@gmail.com is busy "));
+
 
         mockMvc.perform(post("/api/v1/users")
                         .content(objectMapper.writeValueAsString(existEmail))
@@ -139,9 +148,9 @@ class UserControllerTest {
     }
 
     @Test
-    void createUser_ByWrongAge_ReturnErrorResponseUnprocessableEntity400() throws Exception {
+    void createUser_ByWrongAge_ReturnErrorResponseBedRequest400() throws Exception {
 
-        testUser.setBirthDate(LocalDate.of(300,1,1));
+        testUser.setBirthDate(LocalDate.of(3000,1,1));
 
         when(userService.createUser(testUser)).thenThrow(new UserWrongDateException(" Birth date must be earlier than current date "));
 
@@ -159,7 +168,7 @@ class UserControllerTest {
         verify(userService, times(1)).createUser(testUser);
     }
     @Test
-    void createUser_ByWrongDate_ReturnErrorResponseBadRequest422() throws Exception {
+    void createUser_ByWrongDate_ReturnErrorResponseUnprocessableEntity422() throws Exception {
 
         testUser.setBirthDate(LocalDate.of(2015,1,1));
 
@@ -427,7 +436,7 @@ class UserControllerTest {
     void searchUsersByDateRange_ByDateRangeDto_ReturnUserResponseOk200() throws Exception {
 
 
-        when(userService.searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate(), )).thenReturn(list);
+        when(userService.searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate(),pageable)).thenReturn(pageUser);
 
         mockMvc.perform(get("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -437,26 +446,29 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data.content.[0].firstName").value("Serhii"))
                 .andExpect(jsonPath("$.data.content.[0].lastName").value("Shapoval"));
         verify(userService,times(1))
-                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate(), );
+                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate(), pageable );
 
     }
     @Test
     void searchUsersByDateRange_ByWrongDateRangeDto_ReturnUserErrorResponseBadRequest400() throws Exception {
+        DateRangeDto wrongDate = new DateRangeDto(LocalDate.of(2024,1,1),
+                LocalDate.of(2023,1,1));
 
-        when(userService.searchUsersByBirthDateRange(dateRangeDto.getFromDate(), dateRangeDto.getToDate(), ))
-                .thenThrow((new UserWrongDateException(" From date "  + dateRangeDto.getFromDate().toString() + " must be before "
-                        + dateRangeDto.getToDate().toString())));
+
+        when(userService.searchUsersByBirthDateRange(wrongDate.getFromDate(), wrongDate.getToDate(), pageable ))
+                .thenThrow((new UserWrongDateException(" From date "  + wrongDate.getFromDate().toString() + " must be before "
+                        + wrongDate.getToDate().toString())));
 
         mockMvc.perform(get("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dateRangeDto)))
+                        .content(objectMapper.writeValueAsString(wrongDate)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value(" Wrong date "))
                 .andExpect(jsonPath("$.detail").
-                        value(" From date "  + dateRangeDto.getFromDate().toString() + " must be before " + dateRangeDto.getToDate().toString()))
+                        value(" From date "  + wrongDate.getFromDate().toString() + " must be before " + wrongDate.getToDate().toString()))
                 .andExpect(jsonPath("$.path").value("/api/v1/users"));
         verify(userService,times(1))
-                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(),dateRangeDto.getToDate(), );
+                .searchUsersByBirthDateRange(wrongDate.getFromDate(),wrongDate.getToDate(), pageable );
 
     }
 
@@ -471,10 +483,10 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value(" Validation error "))
                 .andExpect(jsonPath("$.detail").
-                        value(" From date can`t be null. This date is required "))
+                        value(" From date can`t be null or empty. This date is required "))
                 .andExpect(jsonPath("$.path").value("/api/v1/users"));
         verify(userService,never())
-                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(),dateRangeDto.getToDate(), );
+                .searchUsersByBirthDateRange(dateRangeDto.getFromDate(),dateRangeDto.getToDate(), pageable );
 
     }
 }

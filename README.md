@@ -29,7 +29,7 @@ Jsons :
 
  "email": "usere1231231@xamplem.com",
 
- firstName": "Serhii",
+ "firstName": "Serhii",
 
  "lastName": "shapoval",
 
@@ -51,7 +51,7 @@ Jsons :
 
  },
 
- "phoneList": [
+ "phoneNumbers": [
 
  "123-456-7890",
 

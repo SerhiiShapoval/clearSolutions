@@ -1,4 +1,4 @@
-package com.shapoval.clearsolution.web.controller.exceptionHandler;
+package com.shapoval.clearsolution.web.exceptionHandler;
 
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;

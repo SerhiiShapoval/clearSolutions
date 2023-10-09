@@ -9,6 +9,7 @@ import com.shapoval.clearsolution.model.Address;
 import com.shapoval.clearsolution.model.User;
 import com.shapoval.clearsolution.repository.UserRepository;
 import com.shapoval.clearsolution.service.serviceImpl.UserServiceImpl;
+import com.shapoval.clearsolution.web.dto.PageResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -40,13 +43,14 @@ class UserServiceTest {
     private User userInvalid;
 
     private User userUpdate;
-
+    private Pageable pageable;
     private List<User> userList;
+
+    private Page<User> pageList;
+
 
     @BeforeEach
     public void setUp() {
-
-        userList = new ArrayList<>();
 
         List<String> phones = List.of("123-456-789");
 
@@ -61,6 +65,10 @@ class UserServiceTest {
 
         this.userUpdate = new User(1L, "update@email.com", "Serhii",
                 LocalDate.of(1991, 1, 13), "Shapoval", address, phones);
+        userList= new ArrayList<>();
+        userList.add(userValid);
+        pageable = PageRequest.of(0,10);
+        pageList = new PageImpl<>(userList,pageable,userList.size());
     }
 
     @Test
@@ -240,19 +248,23 @@ class UserServiceTest {
     @Test
     void testSearchUsersByBirthDateRange_ValidDate_ReturnListUsers() {
 
-        userList.add(userValid);
-        Pageable pageable = PageRequest.of(0,10);
+
         LocalDate from = LocalDate.of(1900,1,1);
         LocalDate to = LocalDate.of(2000,1,1);
 
-        when(userRepository.findUsersByBirthDateBetween(from,to)).thenReturn(userList);
+        when(userRepository.findUsersByBirthDateBetween(from,to,pageable)).thenReturn(pageList);
 
-        var result = userService.searchUsersByBirthDateRange(from,to, );
+        var result = userService.searchUsersByBirthDateRange(from,to,pageable );
 
-        assertNotNull(result);
-        assertTrue(result.size() > 0);
-        assertTrue(result.get(0).getBirthDate().isBefore(to));
-        assertFalse(result.get(0).getBirthDate().isBefore(from));
+        assertTrue(result.getTotalElements() > 0);
+        assertTrue(result.getContent().get(0).getBirthDate().isBefore(to));
+        assertFalse(result.getContent().get(0).getBirthDate().isBefore(from));
+        assertEquals(result.getContent().get(0).getEmail(), pageList.getContent().get(0).getEmail());
+        assertEquals(result.getContent().get(0).getFirstName(),pageList.getContent().get(0).getFirstName());
+        assertEquals(result.getPageable(), pageable);
+        assertEquals(result.getTotalElements(), pageList.getTotalElements() );
+        verify(userRepository, times(1)).findUsersByBirthDateBetween(from,to,pageable);
+
     }
 
     @Test
@@ -262,9 +274,9 @@ class UserServiceTest {
         LocalDate from = LocalDate.of(3000,1,1);
         LocalDate to = LocalDate.of(2000,1,1);
 
-       assertThrows(UserWrongDateException.class, ()-> userService.searchUsersByBirthDateRange(from,to, ));
+       assertThrows(UserWrongDateException.class, ()-> userService.searchUsersByBirthDateRange(from,to, pageable));
         assertTrue(from.isAfter(to));
-        verify(userRepository,never()).findUsersByBirthDateBetween(from,to);
+        verify(userRepository,never()).findUsersByBirthDateBetween(from,to,pageable);
 
     }
 }

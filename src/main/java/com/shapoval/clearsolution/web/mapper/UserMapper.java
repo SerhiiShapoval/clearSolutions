@@ -1,13 +1,13 @@
-package com.shapoval.clearsolution.web.controller.mapper;
+package com.shapoval.clearsolution.web.mapper;
 
-import com.shapoval.clearsolution.web.controller.dto.UserDto;
+import com.shapoval.clearsolution.web.dto.UserDto;
 import com.shapoval.clearsolution.model.User;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import org.springframework.data.domain.Page;
 
 
-@Mapper
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface UserMapper {
 
     UserMapper mapper = Mappers.getMapper(UserMapper.class);

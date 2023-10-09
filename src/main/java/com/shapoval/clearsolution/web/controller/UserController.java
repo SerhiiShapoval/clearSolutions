@@ -1,12 +1,12 @@
 package com.shapoval.clearsolution.web.controller;
 
 
-import com.shapoval.clearsolution.web.controller.dto.PageResponse;
-import com.shapoval.clearsolution.web.controller.dto.DateRangeDto;
-import com.shapoval.clearsolution.web.controller.dto.EmailDto;
-import com.shapoval.clearsolution.web.controller.dto.UserDto;
-import com.shapoval.clearsolution.web.controller.dto.UserResponse;
-import com.shapoval.clearsolution.web.controller.mapper.UserMapper;
+import com.shapoval.clearsolution.web.dto.PageResponse;
+import com.shapoval.clearsolution.web.dto.DateRangeDto;
+import com.shapoval.clearsolution.web.dto.EmailDto;
+import com.shapoval.clearsolution.web.dto.UserDto;
+import com.shapoval.clearsolution.web.dto.UserResponse;
+import com.shapoval.clearsolution.web.mapper.UserMapper;
 import com.shapoval.clearsolution.model.User;
 import com.shapoval.clearsolution.service.UserService;
 
@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,7 @@ import java.net.URI;
 
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping(value = "/api/v1/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class UserController {
 
@@ -43,7 +42,6 @@ public class UserController {
 
             return ResponseEntity.
                     created(URI.create(location + user.getId()))
-                    .contentType(MediaType.APPLICATION_JSON)
                     .body(UserResponse.<UserDto>builder()
                             .data(userMapper.toDTO(user))
                             .path(location + user.getId())
@@ -58,7 +56,6 @@ public class UserController {
 
         return ResponseEntity
                 .ok()
-                .contentType(MediaType.APPLICATION_JSON)
                 .body(UserResponse.<UserDto>builder()
                         .data(userMapper.toDTO(user))
                         .path(location + user.getId())
@@ -72,7 +69,6 @@ public class UserController {
          User user = userService.updateUser(id,userMapper.toUser(userDto));
 
         return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
                 .body(UserResponse.<UserDto>builder()
                         .data(userMapper.toDTO(user))
                         .path(location + user.getId())
@@ -101,7 +97,6 @@ public class UserController {
                         .map(userMapper::toDTO);
         return ResponseEntity
                 .ok()
-                .contentType(MediaType.APPLICATION_JSON)
                 .body(UserResponse.<PageResponse<UserDto>>builder()
                         .data(new PageResponse<>(userDtoList.getContent(),userDtoList.getTotalElements(),pageable))
                         .path(location)
