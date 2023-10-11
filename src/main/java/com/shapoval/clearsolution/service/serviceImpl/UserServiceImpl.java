@@ -87,19 +87,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserById(Long id) {
 
-        if (id <= 0) {
-            log.error( "Invalid user ID: {} ", id );
-            throw new IllegalArgumentException("User ID must be greater than 0");
-        }
-
         return userRepository.findById(id)
                 .orElseThrow(() ->{
                     log.error(" User whit id: {} not found ", id);
-                    throw  new UserNotFoundException(" User with this " + id + " not found ");
+                    return new UserNotFoundException(" User with this " + id + " not found ");
                 });
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
 
         log.info(" Delete user with id: {}", id);

@@ -14,7 +14,16 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
 
-#  users:
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/var/lib/redis-data:/data
+
+
+        #  users:
 #    build: ./
 #    restart: always
 #    container_name: clearSolutions
@@ -25,3 +34,4 @@ services:
 
 volumes:
   postgresSolutions_data: {}
+  redis_data : {}

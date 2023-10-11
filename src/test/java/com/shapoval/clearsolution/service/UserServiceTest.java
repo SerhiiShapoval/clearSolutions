@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -181,16 +182,6 @@ class UserServiceTest {
 
     }
 
-    @Test
-    void testFindUserById_InvalidId_ReturnIllegalArgumentException() {
-
-        Long id = -1L;
-
-        assertThrows(IllegalArgumentException.class, ()->userService.findUserById(id));
-
-        verify(userRepository,never()).findById(id);
-
-    }
 
     @Test
     void testUpdateUserEmail_ReturnUpdateUser() {

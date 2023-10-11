@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -48,14 +49,14 @@ public class UserControllerAdvice {
 
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<UserErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<UserErrorResponse> handleIllegalArgumentException(ConstraintViolationException exception
             , HttpServletRequest request) {
 
         return ResponseEntity.badRequest()
                 .body(UserErrorResponse.builder()
                         .error(ErrorTitle.VALIDATION_ERROR.getError())
-                        .detail(exception.getMessage())
+                        .detail(" Id must be greater than 0 ")
                         .path(request.getRequestURI())
                         .timestamp(LocalDateTime.now())
                         .build());

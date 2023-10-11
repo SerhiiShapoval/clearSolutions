@@ -1,6 +1,7 @@
 package com.shapoval.clearsolution.web.controller;
 
 
+
 import com.shapoval.clearsolution.web.dto.PageResponse;
 import com.shapoval.clearsolution.web.dto.DateRangeDto;
 import com.shapoval.clearsolution.web.dto.EmailDto;
@@ -16,10 +17,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-
 import javax.validation.Valid;
+
+import javax.validation.constraints.Positive;
+
 import java.net.URI;
 
 
@@ -27,6 +32,7 @@ import java.net.URI;
 @RestController
 @RequestMapping(value = "/api/v1/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@Validated
 public class UserController {
 
     private final UserService userService;
@@ -35,8 +41,20 @@ public class UserController {
     private String location = "/api/v1/users/";
 
 
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse<UserDto>> userById(@Positive @PathVariable Long id){
+
+        return ResponseEntity
+                .ok()
+                .body(UserResponse.<UserDto>builder()
+                        .data(userMapper.toDTO(userService.findUserById(id)))
+                        .path(location + id)
+                        .build());
+
+    }
+
     @PostMapping
-    public ResponseEntity<UserResponse<UserDto>> createUser(@Valid @RequestBody UserDto userDto){
+    public ResponseEntity<UserResponse<UserDto>> createUser( @Valid @RequestBody UserDto userDto){
 
             User user = userService.createUser(userMapper.toUser(userDto));
 
@@ -50,7 +68,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<UserResponse<UserDto>> updateUserEmail
-            (@PathVariable Long id, @RequestBody @Valid EmailDto email){
+            (@PathVariable @Positive Long id, @Valid @RequestBody  EmailDto email){
 
         User user = userService.updateUserEmail(id, email.getEmail());
 
@@ -64,7 +82,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse<UserDto>> updateAllFieldsUser(@PathVariable Long id, @RequestBody @Valid UserDto userDto){
+    public ResponseEntity<UserResponse<UserDto>> updateAllFieldsUser(@PathVariable @Positive Long id
+            , @Valid @RequestBody UserDto userDto){
 
          User user = userService.updateUser(id,userMapper.toUser(userDto));
 
@@ -77,7 +96,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id){
+
+    public ResponseEntity<?> deleteUser(  @PathVariable @Positive Long id){
 
         userService.deleteUser(id);
 
@@ -88,13 +108,16 @@ public class UserController {
     }
 
     @GetMapping()
-    private ResponseEntity<UserResponse<PageResponse<UserDto>>> searchUsersByDateRange(@Valid @RequestBody DateRangeDto dateRange
+    public ResponseEntity<UserResponse<PageResponse<UserDto>>> searchUsersByDateRange(
+            @Valid @RequestBody DateRangeDto dateRange
             , @RequestParam(name = "page", defaultValue = "0",required = false) int page
-    , @RequestParam(name = "size", defaultValue = "10",required = false) int size){
+            ,  @RequestParam(name = "size", defaultValue = "10",required = false) int size){
         Pageable pageable = PageRequest.of(page, size);
+
         Page<UserDto> userDtoList =
                 userService.searchUsersByBirthDateRange(dateRange.getFromDate(),dateRange.getToDate(),pageable)
                         .map(userMapper::toDTO);
+
         return ResponseEntity
                 .ok()
                 .body(UserResponse.<PageResponse<UserDto>>builder()
